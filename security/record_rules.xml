@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_perf_manager_all_goals" model="ir.rule">
+        <field name="name">Manager &amp; CEO Full Access: Goals</field>
+        <field name="model_id" ref="model_employee_goal"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('smart_employee_performance_management.group_performance_manager')), (4, ref('smart_employee_performance_management.group_performance_ceo')), (4, ref('base.group_system'))]"/>
+    </record>
+
+    <record id="rule_perf_manager_all_promotions" model="ir.rule">
+        <field name="name">Manager &amp; CEO Full Access: Promotions</field>
+        <field name="model_id" ref="model_promotion_request"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('smart_employee_performance_management.group_performance_manager')), (4, ref('smart_employee_performance_management.group_performance_ceo')), (4, ref('base.group_system'))]"/>
+    </record>
+
+    <record id="rule_perf_manager_all_kpis" model="ir.rule">
+        <field name="name">Manager &amp; CEO Full Access: KPIs</field>
+        <field name="model_id" ref="model_employee_kpi"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('smart_employee_performance_management.group_performance_manager')), (4, ref('smart_employee_performance_management.group_performance_ceo')), (4, ref('base.group_system'))]"/>
+    </record>
+
+    <record id="rule_perf_manager_all_warnings" model="ir.rule">
+        <field name="name">Manager &amp; CEO Full Access: Warnings</field>
+        <field name="model_id" ref="model_warning_record"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('smart_employee_performance_management.group_performance_manager')), (4, ref('smart_employee_performance_management.group_performance_ceo')), (4, ref('base.group_system'))]"/>
+    </record>
+
+    <record id="rule_perf_manager_all_reviews" model="ir.rule">
+        <field name="name">Manager &amp; CEO Full Access: Reviews</field>
+        <field name="model_id" ref="model_performance_review"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('smart_employee_performance_management.group_performance_manager')), (4, ref('smart_employee_performance_management.group_performance_ceo')), (4, ref('base.group_system'))]"/>
+    </record>
+</odoo>

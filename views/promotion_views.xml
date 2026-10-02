@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_promotion_request" model="ir.actions.act_window">
+        <field name="name">Promotion Requests</field>
+        <field name="res_model">promotion.request</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_promotion_request_tree" model="ir.ui.view">
+        <field name="name">promotion.request.list</field>
+        <field name="model">promotion.request</field>
+        <field name="arch" type="xml">
+            <list string="Promotion Dossiers">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="current_job_id"/>
+                <field name="recommended_job_id"/>
+                <field name="is_eligible" widget="boolean_toggle"/>
+                <field name="ai_score"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_promotion_request_form" model="ir.ui.view">
+        <field name="name">promotion.request.form</field>
+        <field name="model">promotion.request</field>
+        <field name="arch" type="xml">
+            <form string="Promotion Dossier">
+                <header>
+                    <button name="action_submit_tl" string="Submit to TL" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_tl_approve" string="TL Recommend" type="object" class="btn-success" invisible="state != 'submitted'"/>
+                    <button name="action_manager_approve" string="Manager Approve" type="object" class="btn-success" invisible="state != 'manager_review'"/>
+                    <button name="action_hr_approve" string="HR Endorse" type="object" class="btn-success" invisible="state != 'hr_review'"/>
+                    <button name="action_ceo_approve" string="CEO Final Approve" type="object" class="btn-success" invisible="state != 'ceo_review'"/>
+                    <button name="action_reject" string="Reject" type="object" class="btn-danger" invisible="state in ('approved', 'rejected')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,manager_review,hr_review,ceo_review,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Candidate Details">
+                            <field name="employee_id"/>
+                            <field name="current_job_id"/>
+                            <field name="recommended_job_id"/>
+                        </group>
+                        <group string="Policy Rule Check">
+                            <field name="is_eligible"/>
+                            <field name="ai_score"/>
+                            <field name="hr_score"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Policy Verification Audit">
+                            <field name="eligibility_notes" readonly="1"/>
+                        </page>
+                        <page string="AI Analysis">
+                            <field name="ai_recommendation" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

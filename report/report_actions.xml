@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_kpi_dossier" model="ir.actions.report">
+        <field name="name">KPI Performance Dossier</field>
+        <field name="model">employee.kpi</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">smart_employee_performance_management.report_kpi_document</field>
+        <field name="report_file">smart_employee_performance_management.report_kpi_document</field>
+    </record>
+</odoo>

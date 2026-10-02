@@ -1,0 +1,900 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="smart_employee_performance_management.MainDashboard">
+        <div class="smart-perf-dashboard-container">
+            <t t-if="!state.isLoggedIn">
+                <div class="auth-gateway-container">
+                    <div class="auth-card-box">
+                        <div class="text-center mb-4">
+                            <div class="brand-logo-circle mb-3">
+                                <i class="fa fa-tachometer text-primary fa-2x"/>
+                            </div>
+                            <h2 class="fw-bold text-dark mb-1">Welcome to Smart Performance</h2>
+                            <p class="text-muted small">Smart Employee Performance &amp; Promotion System (Odoo 19)</p>
+                        </div>
+
+                        <t t-if="state.loginErrorMessage">
+                            <div class="alert alert-danger py-2 small fw-bold mb-3">
+                                <i class="fa fa-exclamation-circle me-1"/> <t t-esc="state.loginErrorMessage"/>
+                            </div>
+                        </t>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Email / Username</label>
+                            <input type="text" class="form-control rounded-3" t-model="state.loginForm.username" placeholder="e.g. admin, ceo, hr, manager..."/>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-muted">Password</label>
+                            <input type="password" class="form-control rounded-3" t-model="state.loginForm.password" placeholder="Password"/>
+                        </div>
+
+                        <button class="btn btn-primary w-100 py-2 rounded-3 fw-bold shadow-sm mb-4" t-on-click="performLogin">
+                            Sign In to Dashboard
+                        </button>
+
+                        <div class="border-top pt-3">
+                            <div class="text-muted small fw-bold text-center mb-2">1-Click Role Login Demo:</div>
+                            <div class="d-flex flex-wrap gap-1 justify-content-center">
+                                <button class="btn btn-sm btn-outline-danger" t-on-click="() => this.quickDemoLogin('admin', 'admin')">Admin</button>
+                                <button class="btn btn-sm btn-outline-primary" t-on-click="() => this.quickDemoLogin('ceo', 'ceo')">CEO</button>
+                                <button class="btn btn-sm btn-outline-info" t-on-click="() => this.quickDemoLogin('hr', 'hr')">HR</button>
+                                <button class="btn btn-sm btn-outline-success" t-on-click="() => this.quickDemoLogin('manager', 'manager')">Manager</button>
+                                <button class="btn btn-sm btn-outline-warning" t-on-click="() => this.quickDemoLogin('team_leader', 'team_leader')">Team Leader</button>
+                                <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.quickDemoLogin('employee', 'employee')">Employee Demo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+
+            <t t-else="">
+                <div class="dash-header-bar">
+                    <div class="dash-title-group">
+                        <h2 class="dash-main-title">
+                            <i class="fa fa-tachometer text-primary me-2"/>Smart Employee Performance &amp; Promotion System
+                        </h2>
+                        <span class="dash-subtitle">
+                            Logged in as: <strong class="text-primary"><t t-esc="state.activeEmployeeName"/></strong>
+                            (<span class="badge bg-light text-dark border ms-1"><t t-esc="state.activeRole.toUpperCase()"/></span>)
+                        </span>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <t t-if="state.activeRole === 'admin' || state.activeRole === 'ceo' || state.activeRole === 'hr' || state.activeRole === 'manager' || state.activeRole === 'team_leader'">
+                            <button class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm" t-on-click="() => this.createNewRecord('hr.employee')">
+                                <i class="fa fa-user-plus me-1"/> Add Employee
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm rounded-pill px-3" t-on-click="() => this.openModelList('employee.attendance.log', [], 'Attendance Records')">
+                                <i class="fa fa-clock-o me-1"/> Log Attendees
+                            </button>
+                            <button class="btn btn-outline-success btn-sm rounded-pill px-3" t-on-click="() => this.createNewRecord('promotion.request')">
+                                <i class="fa fa-star me-1"/> Promotion Request
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" t-on-click="() => this.openModelList('hr.department', [], 'Departments')">
+                                <i class="fa fa-building-o me-1"/> Departments
+                            </button>
+                        </t>
+
+                        <t t-if="state.activeRole === 'admin' || state.activeRole === 'manager' || state.activeRole === 'team_leader'">
+                            <button class="btn btn-warning btn-sm rounded-pill px-3 shadow-sm text-dark fw-bold" t-on-click="() => this.createNewRecord('employee.goal')">
+                                <i class="fa fa-bullseye me-1"/> Set Goal
+                            </button>
+                            <button class="btn btn-info btn-sm rounded-pill px-3 shadow-sm text-white fw-bold" t-on-click="() => this.createNewRecord('performance.review')">
+                                <i class="fa fa-check-square me-1"/> Check Performance
+                            </button>
+                        </t>
+
+                        <button class="btn btn-light btn-sm rounded-pill px-3 border text-danger fw-bold ms-2" t-on-click="performLogout">
+                            <i class="fa fa-sign-out me-1"/> Switch User
+                        </button>
+                    </div>
+                </div>
+
+                <div class="dash-nav-tabs">
+                    <t t-if="state.activeRole === 'admin' || state.activeRole === 'ceo'">
+                        <button t-attf-class="nav-tab-btn #{state.activeTab === 'ceo' ? 'active' : ''}" t-on-click="() => this.switchTab('ceo')">
+                            <i class="fa fa-briefcase me-1"/> CEO Dashboard
+                        </button>
+                    </t>
+
+                    <t t-if="state.activeRole === 'admin' || state.activeRole === 'hr'">
+                        <button t-attf-class="nav-tab-btn #{state.activeTab === 'hr' ? 'active' : ''}" t-on-click="() => this.switchTab('hr')">
+                            <i class="fa fa-users me-1"/> HR Operations
+                        </button>
+                    </t>
+
+                    <t t-if="state.activeRole === 'admin' || state.activeRole === 'manager'">
+                        <button t-attf-class="nav-tab-btn #{state.activeTab === 'manager' ? 'active' : ''}" t-on-click="() => this.switchTab('manager')">
+                            <i class="fa fa-line-chart me-1"/> Manager View
+                        </button>
+                    </t>
+
+                    <t t-if="state.activeRole === 'admin' || state.activeRole === 'team_leader'">
+                        <button t-attf-class="nav-tab-btn #{state.activeTab === 'team_leader' ? 'active' : ''}" t-on-click="() => this.switchTab('team_leader')">
+                            <i class="fa fa-check-circle me-1"/> Team Leader
+                        </button>
+                    </t>
+
+                    <button t-attf-class="nav-tab-btn #{state.activeTab === 'employee' ? 'active' : ''}" t-on-click="() => this.switchTab('employee')">
+                        <i class="fa fa-user me-1"/> My Portal
+                    </button>
+                    <button t-attf-class="nav-tab-btn #{state.activeTab === 'ai_analytics' ? 'active' : ''}" t-on-click="() => this.switchTab('ai_analytics')">
+                        <i class="fa fa-magic text-warning me-1"/> AI Analysis
+                    </button>
+                    <button t-attf-class="nav-tab-btn #{state.activeTab === 'reports' ? 'active' : ''}" t-on-click="() => this.switchTab('reports')">
+                        <i class="fa fa-file-text me-1"/> Report Dashboard
+                    </button>
+                </div>
+
+                <div t-if="state.loading" class="text-center py-5 my-5">
+                    <i class="fa fa-circle-o-notch fa-spin fa-3x text-primary mb-3"/>
+                    <div class="text-muted fw-bold">Synchronizing dynamic metrics...</div>
+                </div>
+
+                <t t-if="!state.loading and state.data and state.data.kpis">
+                    <!-- 1. CEO DASHBOARD -->
+                    <div t-if="state.activeTab === 'ceo'" class="dash-view-content">
+                        <div class="kpi-cards-grid">
+                            <div class="kpi-metric-card card-indigo" t-on-click="() => this.openModelList('hr.employee', [], 'All Employees')">
+                                <div class="card-label">Total Employees</div>
+                                <div class="card-number"><t t-esc="state.data.kpis.total_employees"/></div>
+                                <div class="card-hint text-success"><i class="fa fa-external-link me-1"/> Directory</div>
+                            </div>
+                            <div class="kpi-metric-card card-emerald" t-on-click="() => this.openActiveStaff()">
+                                <div class="card-label">Active Staff</div>
+                                <div class="card-number"><t t-esc="state.data.kpis.active_employees"/></div>
+                                <div class="card-hint text-success"><i class="fa fa-check"/> Active Capacity</div>
+                            </div>
+                            <div class="kpi-metric-card card-purple" t-on-click="() => this.openModelList('promotion.request', [], 'Promotion Candidates')">
+                                <div class="card-label">Promotion Candidates</div>
+                                <div class="card-number"><t t-esc="state.data.kpis.promotion_candidates"/></div>
+                                <div class="card-hint text-primary"><i class="fa fa-star"/> Final CEO Stage</div>
+                            </div>
+                            <div class="kpi-metric-card card-amber" t-on-click="() => this.openModelList('employee.kpi', [], 'Company KPIs')">
+                                <div class="card-label">Avg Company KPI</div>
+                                <div class="card-number"><t t-esc="state.data.kpis.avg_company_kpi"/></div>
+                                <div class="card-hint text-warning"><i class="fa fa-line-chart"/> Formula 30-20-20-15-15</div>
+                            </div>
+                            <div class="kpi-metric-card card-rose" t-on-click="() => this.openModelList('warning.record', [], 'Active Warnings')">
+                                <div class="card-label">Active Warnings</div>
+                                <div class="card-number"><t t-esc="state.data.kpis.active_warnings"/></div>
+                                <div class="card-hint text-danger"><i class="fa fa-exclamation-triangle"/> Disciplinary Blocks</div>
+                            </div>
+                        </div>
+
+                        <div class="ai-strategic-box">
+                            <div class="ai-header"><i class="fa fa-bolt me-2"/> AI Strategic Performance Insight</div>
+                            <p class="ai-text"><t t-esc="state.data.ai_summary"/></p>
+                        </div>
+
+                        <div class="dash-grid-2">
+                            <div class="dash-panel">
+                                <div class="panel-title"><i class="fa fa-pie-chart text-primary me-2"/> Working Format (Remote vs On-Site)</div>
+                                <div class="d-flex align-items-center justify-content-around py-3">
+                                    <svg width="150" height="150" viewBox="0 0 42 42">
+                                        <circle cx="21" cy="21" r="15.915" fill="#fff" stroke="#e2e8f0" stroke-width="6"/>
+                                        <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#6366f1" stroke-width="6" t-attf-stroke-dasharray="#{state.data.charts.working_format.remote} #{100 - state.data.charts.working_format.remote}" stroke-dashoffset="25"/>
+                                        <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#10b981" stroke-width="6" t-attf-stroke-dasharray="#{state.data.charts.working_format.onsite} #{100 - state.data.charts.working_format.onsite}" stroke-dashoffset="90"/>
+                                    </svg>
+                                    <div>
+                                        <div class="d-flex align-items-center gap-2 mb-2"><div style="width: 14px; height: 14px; background: #6366f1; border-radius: 4px;"/> <strong>Remote: <t t-esc="state.data.charts.working_format.remote"/>%</strong></div>
+                                        <div class="d-flex align-items-center gap-2"><div style="width: 14px; height: 14px; background: #10b981; border-radius: 4px;"/> <strong>On-Site: <t t-esc="state.data.charts.working_format.onsite"/>%</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="dash-panel">
+                                <div class="panel-title"><i class="fa fa-bar-chart text-indigo me-2"/> Department Performance Benchmark</div>
+                                <div class="bars-container" t-if="state.data.charts and state.data.charts.dept_performance and state.data.charts.dept_performance.labels and state.data.charts.dept_performance.labels.length">
+                                    <t t-foreach="state.data.charts.dept_performance.labels" t-as="l" t-key="l_index">
+                                        <div class="bar-row">
+                                            <span class="bar-name"><t t-esc="l"/></span>
+                                            <div class="bar-track">
+                                                <div class="bar-fill" t-attf-style="width: #{state.data.charts.dept_performance.data[l_index]}%;"/>
+                                            </div>
+                                            <span class="bar-val"><t t-esc="state.data.charts.dept_performance.data[l_index]"/>%</span>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dash-grid-2 mt-4">
+                            <div class="dash-panel">
+                                <div class="panel-title text-success"><i class="fa fa-trophy text-warning me-2"/> Top Performers</div>
+                                <table class="dash-table" t-if="state.data.tables and state.data.tables.top_performers and state.data.tables.top_performers.length">
+                                    <thead><tr><th>Employee</th><th>Department</th><th>Score</th></tr></thead>
+                                    <tbody>
+                                        <t t-foreach="state.data.tables.top_performers" t-as="tp" t-key="tp_index">
+                                            <tr style="cursor: pointer;" t-on-click="() => this.openRecord('hr.employee', tp.id)">
+                                                <td><strong><t t-esc="tp.name"/></strong></td><td><t t-esc="tp.dept"/></td><td><span class="badge badge-soft-emerald p-2"><t t-esc="tp.kpi"/> pts</span></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="dash-panel">
+                                <div class="panel-title text-danger"><i class="fa fa-fire text-danger me-2"/> Department Attrition Risk Heatmap</div>
+                                <table class="dash-table" t-if="state.data.charts and state.data.charts.attrition_heatmap and state.data.charts.attrition_heatmap.length">
+                                    <thead><tr><th>Department</th><th>Risk Category</th><th>Flight Index</th></tr></thead>
+                                    <tbody>
+                                        <t t-foreach="state.data.charts.attrition_heatmap" t-as="h" t-key="h_index">
+                                            <tr>
+                                                <td><strong><t t-esc="h.dept"/></strong></td>
+                                                <td><span t-attf-class="badge #{h.risk === 'High' ? 'badge-soft-rose' : h.risk === 'Medium' ? 'badge-soft-amber' : 'badge-soft-emerald'} p-2"><t t-esc="h.risk"/></span></td>
+                                                <td><strong t-attf-style="color: #{h.color};"><t t-esc="h.score"/>%</strong></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. HR OPERATIONS DASHBOARD -->
+                    <div t-if="state.activeTab === 'hr'" class="dash-view-content">
+                        <div class="kpi-cards-grid">
+                            <div class="kpi-metric-card card-indigo" t-on-click="() => this.openModelList('hr.employee', [], 'Total Staff')"><div class="card-label">Total Staff</div><div class="card-number"><t t-esc="state.data.kpis.total_employees"/></div></div>
+                            <div class="kpi-metric-card card-cyan" t-on-click="() => this.openModelList('hr.employee', [], 'New Joiners')"><div class="card-label">New Joiners</div><div class="card-number text-cyan"><t t-esc="state.data.kpis.new_employees"/></div></div>
+                            <div class="kpi-metric-card card-amber" t-on-click="() => this.openModelList('employee.leave', [['state', '=', 'approved']], 'Approved Leaves')"><div class="card-label">On Leave</div><div class="card-number text-amber"><t t-esc="state.data.kpis.number_of_leave"/></div></div>
+                            <div class="kpi-metric-card card-purple" t-on-click="() => this.openModelList('training.enrollment', [], 'Training Enrollments')"><div class="card-label">Training Rate</div><div class="card-number text-purple"><t t-esc="state.data.kpis.training_completion_rate"/>%</div></div>
+                            <div class="kpi-metric-card card-rose" t-on-click="() => this.openModelList('warning.record', [], 'Disciplinary Warnings')"><div class="card-label">Active Warnings</div><div class="card-number text-rose"><t t-esc="state.data.kpis.active_warnings"/></div></div>
+                            <div class="kpi-metric-card card-emerald" t-on-click="() => this.openModelList('reward.record', [], 'Rewards')"><div class="card-label">Rewards Issued</div><div class="card-number text-emerald"><t t-esc="state.data.kpis.rewards_issued"/></div></div>
+                        </div>
+
+                        <div class="dash-grid-2 mb-4" t-if="state.data.punctuality_pie">
+                            <div class="dash-panel">
+                                <div class="panel-title"><i class="fa fa-pie-chart text-primary me-2"/> Today's Punctuality: On-Time vs Late (>10m)</div>
+                                <div class="d-flex align-items-center justify-content-around py-3">
+                                    <svg width="150" height="150" viewBox="0 0 42 42">
+                                        <circle cx="21" cy="21" r="15.915" fill="#fff" stroke="#e2e8f0" stroke-width="6"/>
+                                        <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#10b981" stroke-width="6"
+                                                t-attf-stroke-dasharray="#{state.data.punctuality_pie.on_time_pct} #{100 - state.data.punctuality_pie.on_time_pct}" stroke-dashoffset="25"/>
+                                        <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#f59e0b" stroke-width="6"
+                                                t-attf-stroke-dasharray="#{state.data.punctuality_pie.late_pct} #{100 - state.data.punctuality_pie.late_pct}"
+                                                t-attf-stroke-dashoffset="#{125 - state.data.punctuality_pie.on_time_pct}"/>
+                                    </svg>
+                                    <div>
+                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                            <div style="width: 14px; height: 14px; background: #10b981; border-radius: 4px;"/>
+                                            <span>On Time (&lt;=10m): <strong><t t-esc="state.data.punctuality_pie.on_time_count"/> (<t t-esc="state.data.punctuality_pie.on_time_pct"/>%)</strong></span>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                            <div style="width: 14px; height: 14px; background: #f59e0b; border-radius: 4px;"/>
+                                            <span>Late (>10m): <strong><t t-esc="state.data.punctuality_pie.late_count"/> (<t t-esc="state.data.punctuality_pie.late_pct"/>%)</strong></span>
+                                        </div>
+                                        <div class="small text-danger fw-bold mt-2"><i class="fa fa-info-circle me-1"/> Policy: 4 Lates = 1 Day Salary Deduction</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="dash-panel">
+                                <div class="panel-title"><i class="fa fa-pie-chart text-indigo me-2"/> Leave Type Distribution</div>
+                                <div class="d-flex align-items-center justify-content-around py-3">
+                                    <svg width="140" height="140" viewBox="0 0 42 42">
+                                        <circle cx="21" cy="21" r="15.915" fill="#fff" stroke="#e2e8f0" stroke-width="6"/>
+                                        <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#3b82f6" stroke-width="6" stroke-dasharray="45 55" stroke-dashoffset="25"/>
+                                        <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#f43f5e" stroke-width="6" stroke-dasharray="25 75" stroke-dashoffset="80"/>
+                                        <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#8b5cf6" stroke-width="6" stroke-dasharray="20 80" stroke-dashoffset="55"/>
+                                        <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#10b981" stroke-width="6" stroke-dasharray="10 90" stroke-dashoffset="35"/>
+                                    </svg>
+                                    <div>
+                                        <t t-if="state.data.charts and state.data.charts.leave_distribution and state.data.charts.leave_distribution.length">
+                                            <t t-foreach="state.data.charts.leave_distribution" t-as="lv" t-key="lv_index">
+                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                    <div style="width: 12px; height: 12px; border-radius: 3px;" t-attf-style="background-color: #{lv.color};"/>
+                                                    <span><t t-esc="lv.label"/>: <strong><t t-esc="lv.value"/>%</strong></span>
+                                                </div>
+                                            </t>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dash-grid-2 mb-4" t-if="state.data.tables">
+                            <div class="dash-panel">
+                                <div class="panel-title"><i class="fa fa-exclamation-circle text-danger me-2"/> Active Disciplinary Warnings</div>
+                                <table class="dash-table" t-if="state.data.tables.warning_requests and state.data.tables.warning_requests.length">
+                                    <thead><tr><th>Ref</th><th>Employee</th><th>Type</th><th>Deduction</th></tr></thead>
+                                    <tbody>
+                                        <t t-foreach="state.data.tables.warning_requests" t-as="w" t-key="w_index">
+                                            <tr style="cursor: pointer;" t-on-click="() => this.openRecord('warning.record', w.id)">
+                                                <td><t t-esc="w.name"/></td><td><t t-esc="w.employee"/></td><td><t t-esc="w.type"/></td><td>-<t t-esc="w.deduction"/> pts</td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="dash-panel">
+                                <div class="panel-title"><i class="fa fa-star text-warning me-2"/> Pending Promotion Requests</div>
+                                <table class="dash-table" t-if="state.data.tables.promotion_requests and state.data.tables.promotion_requests.length">
+                                    <thead><tr><th>Reference</th><th>Employee</th><th>Target Role</th><th>AI Score</th></tr></thead>
+                                    <tbody>
+                                        <t t-foreach="state.data.tables.promotion_requests" t-as="pr" t-key="pr_index">
+                                            <tr style="cursor: pointer;" t-on-click="() => this.openRecord('promotion.request', pr.id)">
+                                                <td><t t-esc="pr.name"/></td><td><t t-esc="pr.employee"/></td><td><t t-esc="pr.job"/></td><td><span class="badge badge-soft-emerald p-2"><t t-esc="pr.ai_score"/></span></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. MANAGER DASHBOARD -->
+                    <div t-if="state.activeTab === 'manager'" class="dash-view-content">
+                        <div class="kpi-cards-grid">
+                            <div class="kpi-metric-card card-indigo" t-on-click="() => this.openModelList('employee.kpi', [], 'Team KPIs')"><div class="card-label">Team Score</div><div class="card-number"><t t-esc="state.data.kpis.team_score"/></div></div>
+                            <div class="kpi-metric-card card-amber" t-on-click="() => this.openModelList('employee.goal', [['state', 'in', ['submitted', 'leader_approved']]], 'Pending Goals')"><div class="card-label">Pending Goals</div><div class="card-number text-amber"><t t-esc="state.data.kpis.pending_goals"/></div></div>
+                            <div class="kpi-metric-card card-purple" t-on-click="() => this.openModelList('performance.review', [], 'Pending Reviews')"><div class="card-label">Reviews Pending</div><div class="card-number text-purple"><t t-esc="state.data.kpis.pending_reviews"/></div></div>
+                            <div class="kpi-metric-card card-emerald"><div class="card-label">Avg Attendance</div><div class="card-number text-emerald"><t t-esc="state.data.kpis.avg_attendance"/>%</div></div>
+                        </div>
+
+                        <div class="dash-panel my-4" t-if="state.data.tables and state.data.tables.pending_goals and state.data.tables.pending_goals.length">
+                            <div class="panel-title"><i class="fa fa-check-square-o text-success me-2"/> Subordinate Goals Awaiting Manager Approval</div>
+                            <table class="dash-table">
+                                <thead><tr><th>Goal Description</th><th>Employee</th><th>Weight</th><th>Due Date</th><th>Action</th></tr></thead>
+                                <tbody>
+                                    <t t-foreach="state.data.tables.pending_goals" t-as="pg" t-key="pg_index">
+                                        <tr style="cursor: pointer;" t-on-click="() => this.openRecord('employee.goal', pg.id)">
+                                            <td><strong><t t-esc="pg.name"/></strong></td><td><t t-esc="pg.employee"/></td><td><t t-esc="pg.weight"/>%</td><td><t t-esc="pg.due"/></td>
+                                            <td><span class="badge badge-soft-amber p-2">Review &amp; Approve</span></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 4. TEAM LEADER DASHBOARD -->
+                    <div t-if="state.activeTab === 'team_leader'" class="dash-view-content">
+                        <div class="kpi-cards-grid">
+                            <div class="kpi-metric-card card-emerald"><div class="card-label">Team Attendance</div><div class="card-number text-emerald"><t t-esc="state.data.kpis.team_attendance"/>%</div></div>
+                            <div class="kpi-metric-card card-cyan" t-on-click="() => this.openModelList('employee.goal', [], 'Team Goals')"><div class="card-label">Sprint Goal Progress</div><div class="card-number text-cyan"><t t-esc="state.data.kpis.goal_progress"/>%</div></div>
+                            <div class="kpi-metric-card card-purple" t-on-click="() => this.openModelList('employee.goal', [['state', '=', 'completed']], 'Completed Tasks')"><div class="card-label">Tasks Completed</div><div class="card-number text-purple"><t t-esc="state.data.kpis.tasks_completed"/></div></div>
+                            <div class="kpi-metric-card card-rose" t-on-click="() => this.openModelList('warning.record', [], 'Team Warnings')"><div class="card-label">Team Warnings</div><div class="card-number text-rose"><t t-esc="state.data.kpis.team_warnings"/></div></div>
+                        </div>
+
+                        <div class="dash-grid-2 my-4">
+                            <div class="dash-panel" t-if="state.data.charts and state.data.charts.radar_skills and state.data.charts.radar_skills.length">
+                                <div class="panel-title"><i class="fa fa-bullseye text-primary me-2"/> Team Competency Matrix</div>
+                                <div class="bars-container">
+                                    <t t-foreach="state.data.charts.radar_skills" t-as="rs" t-key="rs_index">
+                                        <div class="bar-row">
+                                            <span class="bar-name"><t t-esc="rs.skill"/></span>
+                                            <div class="bar-track"><div class="bar-fill" t-attf-style="width: #{rs.value}%;"/></div>
+                                            <span class="bar-val"><t t-esc="rs.value"/>%</span>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+
+                            <div class="dash-panel" t-if="state.data.tables and state.data.tables.goal_approvals and state.data.tables.goal_approvals.length">
+                                <div class="panel-title"><i class="fa fa-tasks text-emerald me-2"/> Direct Team Goal Approvals</div>
+                                <table class="dash-table">
+                                    <thead><tr><th>Goal Description</th><th>Member</th><th>Weight</th><th>Action</th></tr></thead>
+                                    <tbody>
+                                        <t t-foreach="state.data.tables.goal_approvals" t-as="ga" t-key="ga_index">
+                                            <tr style="cursor: pointer;" t-on-click="() => this.openRecord('employee.goal', ga.id)">
+                                                <td><strong><t t-esc="ga.name"/></strong></td><td><t t-esc="ga.employee"/></td><td><t t-esc="ga.weight"/>%</td>
+                                                <td><span class="badge badge-soft-indigo p-2">TL Sign-Off</span></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. EMPLOYEE DASHBOARD (MY PORTAL - FULL 6 SRS METRICS & 6 SECTIONS) -->
+                    <div t-if="state.activeTab === 'employee'" class="dash-view-content">
+                        <!-- Header Banner -->
+                        <div class="employee-details-header-card mb-4" t-if="state.data.employee_profile">
+                            <div class="orange-corner-ribbon">
+                                <i class="fa fa-sun-o me-1"/> <t t-esc="state.data.employee_profile.greeting"/>
+                            </div>
+
+                            <div class="banner-inner-content">
+                                <div class="avatar-col">
+                                    <div class="avatar-ring-frame">
+                                        <img class="avatar-img" src="/smart_employee_performance_management/static/src/img/default_avatar.png"
+                                             t-att-src="'/web/image?model=hr.employee&amp;id=' + state.data.employee_profile.id + '&amp;field=avatar_128'"
+                                             onerror="this.src='/web/static/img/placeholder.png'"/>
+                                    </div>
+                                </div>
+
+                                <div class="profile-details-grid">
+                                    <div class="profile-name-row">
+                                        <h2 class="profile-title"><t t-esc="state.data.employee_profile.name"/></h2>
+                                    </div>
+
+                                    <div class="details-cols-container">
+                                        <div class="detail-col">
+                                            <div class="meta-item"><i class="fa fa-id-card-o text-primary meta-icon"/><div><div class="meta-label">EMPLOYEE ID</div><div class="meta-val"><t t-esc="state.data.employee_profile.employee_code"/></div></div></div>
+                                            <div class="meta-item"><i class="fa fa-user-circle-o text-primary meta-icon"/><div><div class="meta-label">DESIGNATION</div><div class="meta-val"><t t-esc="state.data.employee_profile.designation"/></div></div></div>
+                                            <div class="meta-item"><i class="fa fa-sitemap text-primary meta-icon"/><div><div class="meta-label">DEPARTMENT</div><div class="meta-val"><t t-esc="state.data.employee_profile.department"/></div></div></div>
+                                        </div>
+                                        <div class="detail-col">
+                                            <div class="meta-item"><i class="fa fa-envelope-o text-primary meta-icon"/><div><div class="meta-label">EMAIL</div><div class="meta-val"><t t-esc="state.data.employee_profile.email"/></div></div></div>
+                                            <div class="meta-item"><i class="fa fa-phone text-primary meta-icon"/><div><div class="meta-label">PERSONAL NUMBER</div><div class="meta-val"><t t-esc="state.data.employee_profile.personal_phone"/></div></div></div>
+                                            <div class="meta-item"><i class="fa fa-mobile text-primary meta-icon"/><div><div class="meta-label">OFFICIAL NUMBER</div><div class="meta-val"><t t-esc="state.data.employee_profile.official_phone"/></div></div></div>
+                                            <div class="meta-item"><i class="fa fa-building-o text-primary meta-icon"/><div><div class="meta-label">COMPANY</div><div class="meta-val"><t t-esc="state.data.employee_profile.company"/></div></div></div>
+                                        </div>
+                                        <div class="detail-col">
+                                            <div class="meta-item"><i class="fa fa-vcard-o text-primary meta-icon"/><div><div class="meta-label">EMPLOYMENT STATUS</div><div class="meta-val"><t t-esc="state.data.employee_profile.employment_status"/></div></div></div>
+                                            <div class="meta-item"><i class="fa fa-calendar-check-o text-primary meta-icon"/><div><div class="meta-label">JOINING DATE</div><div class="meta-val"><t t-esc="state.data.employee_profile.joining_date"/></div></div></div>
+                                            <div class="meta-item"><i class="fa fa-briefcase text-primary meta-icon"/><div><div class="meta-label">SERVICE LENGTH</div><div class="meta-val"><t t-esc="state.data.employee_profile.service_length"/></div></div></div>
+                                        </div>
+                                        <div class="detail-col">
+                                            <div class="meta-item"><i class="fa fa-users text-primary meta-icon"/><div><div class="meta-label">SUPERVISOR</div><div class="meta-val"><t t-esc="state.data.employee_profile.supervisor"/></div></div></div>
+                                            <div class="meta-item"><i class="fa fa-user-plus text-primary meta-icon"/><div><div class="meta-label">DOTTED SUPERVISOR</div><div class="meta-val"><t t-esc="state.data.employee_profile.dotted_supervisor"/></div></div></div>
+                                            <div class="meta-item"><i class="fa fa-user-secret text-primary meta-icon"/><div><div class="meta-label">LINE MANAGER</div><div class="meta-val"><t t-esc="state.data.employee_profile.line_manager"/></div></div></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AI Notice Alert -->
+                        <div class="card shadow-sm border-0 rounded-4 mb-4" t-if="state.data.ai_notice">
+                            <div class="card-body p-4 bg-soft-rose border-start border-4 border-danger rounded-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="fa fa-bell text-danger fa-2x"/>
+                                    <div>
+                                        <h5 class="fw-bold text-danger mb-1">AI Disciplinary Notice Board</h5>
+                                        <p class="mb-0 text-dark fw-bold"><t t-esc="state.data.ai_notice"/></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 6 SRS Metric Cards -->
+                        <div class="kpi-cards-grid">
+                            <div class="kpi-metric-card card-indigo" t-on-click="() => this.openMyKpis()"><div class="card-label">KPI Score</div><div class="card-number"><t t-esc="state.data.kpis.kpi_score"/></div><div class="card-hint text-success">Weighted 30-20-20-15-15</div></div>
+                            <div class="kpi-metric-card card-emerald" t-on-click="() => this.openMyAttendance()"><div class="card-label">Attendance %</div><div class="card-number"><t t-esc="state.data.kpis.attendance_pct"/>%</div><div class="card-hint text-success">Target &gt;= 80% Met</div></div>
+                            <div class="kpi-metric-card card-cyan" t-on-click="() => this.openMyGoals()"><div class="card-label">Goal Progress %</div><div class="card-number"><t t-esc="state.data.kpis.goal_progress_pct"/>%</div><div class="card-hint text-primary">Live Sprints</div></div>
+                            <div class="kpi-metric-card card-purple" t-on-click="() => this.openMyTrainings()"><div class="card-label">Training Progress</div><div class="card-number"><t t-esc="state.data.kpis.training_progress_pct"/>%</div><div class="card-hint text-purple">Mandatory 100%</div></div>
+                            <div class="kpi-metric-card card-amber" t-on-click="() => this.openMyRewards()"><div class="card-label">Reward Count</div><div class="card-number"><t t-esc="state.data.kpis.reward_count"/></div><div class="card-hint text-warning">Total Honors</div></div>
+                            <div class="kpi-metric-card card-rose" t-on-click="() => this.openMyWarnings()"><div class="card-label">Warning Count</div><div class="card-number"><t t-esc="state.data.kpis.warning_count"/></div><div class="card-hint text-danger">Active Infractions</div></div>
+                        </div>
+
+                        <!-- Section 1: Goal Tracker (Progress Timeline) -->
+                        <div class="dash-panel my-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="panel-title mb-0"><i class="fa fa-crosshairs text-indigo me-2"/> Goal Tracker (Progress Timeline)</div>
+                                <button class="btn btn-sm btn-outline-primary rounded-pill px-3" t-on-click="() => this.openMyGoals()">View All Goals</button>
+                            </div>
+                            <div class="row g-3" t-if="state.data.goals and state.data.goals.length">
+                                <t t-foreach="state.data.goals" t-as="g" t-key="g_index">
+                                    <div class="col-md-6">
+                                        <div class="p-3 bg-light rounded-4 border" style="cursor: pointer;" t-on-click="() => this.openRecord('employee.goal', g.id)">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <strong><t t-esc="g.name"/></strong>
+                                                <span class="text-primary fw-bold"><t t-esc="g.progress"/>%</span>
+                                            </div>
+                                            <div class="progress mb-2" style="height: 10px;">
+                                                <div class="progress-bar bg-indigo" t-attf-style="width: #{g.progress}%;"/>
+                                            </div>
+                                            <div class="d-flex justify-content-between text-muted small">
+                                                <span>Weight: <t t-esc="g.weight"/>%</span>
+                                                <span class="badge bg-white text-dark border"><t t-esc="g.stage"/></span>
+                                                <span>Due: <t t-esc="g.due"/></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+
+                        <!-- Section 2: Training Courses (Cards) -->
+                        <div class="dash-panel my-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="panel-title mb-0"><i class="fa fa-graduation-cap text-cyan me-2"/> Training Courses</div>
+                                <button class="btn btn-sm btn-outline-cyan rounded-pill px-3" t-on-click="() => this.openMyTrainings()">Enrollments</button>
+                            </div>
+                            <div class="row g-3" t-if="state.data.trainings and state.data.trainings.length">
+                                <t t-foreach="state.data.trainings" t-as="tr" t-key="tr_index">
+                                    <div class="col-md-6">
+                                        <div class="p-3 bg-light rounded-4 border">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6 class="fw-bold mb-0 text-dark"><t t-esc="tr.course"/></h6>
+                                                <span class="badge badge-soft-indigo p-2"><t t-esc="tr.category"/></span>
+                                            </div>
+                                            <div class="progress mb-2" style="height: 8px;">
+                                                <div class="progress-bar bg-cyan" t-attf-style="width: #{tr.progress}%;"/>
+                                            </div>
+                                            <div class="d-flex justify-content-between text-muted small">
+                                                <span>Duration: <t t-esc="tr.duration"/></span>
+                                                <span class="fw-bold text-success"><t t-esc="tr.state"/></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+
+                        <!-- Section 3 & 4: Reward History (Timeline) & Warnings (Table) -->
+                        <div class="dash-grid-2 my-4">
+                            <div class="dash-panel">
+                                <div class="panel-title"><i class="fa fa-trophy text-warning me-2"/> Reward History (Timeline)</div>
+                                <div t-if="state.data.rewards and state.data.rewards.length">
+                                    <t t-foreach="state.data.rewards" t-as="rw" t-key="rw_index">
+                                        <div class="p-3 mb-2 rounded bg-light border-start border-4 border-warning d-flex justify-content-between align-items-center" style="cursor: pointer;" t-on-click="() => this.openMyRewards()">
+                                            <div>
+                                                <h6 class="mb-0 fw-bold"><t t-esc="rw.name"/></h6>
+                                                <small class="text-muted"><t t-esc="rw.type"/> • <t t-esc="rw.date"/></small>
+                                                <div class="small text-dark mt-1"><t t-esc="rw.reason"/></div>
+                                            </div>
+                                            <i class="fa fa-certificate fa-2x text-warning"/>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+
+                            <div class="dash-panel">
+                                <div class="panel-title text-danger"><i class="fa fa-exclamation-triangle text-danger me-2"/> Warnings History</div>
+                                <table class="dash-table" t-if="state.data.warnings and state.data.warnings.length">
+                                    <thead><tr><th>Code</th><th>Type</th><th>Deduction</th><th>Status</th></tr></thead>
+                                    <tbody>
+                                        <t t-foreach="state.data.warnings" t-as="w" t-key="w_index">
+                                            <tr style="cursor: pointer;" t-on-click="() => this.openMyWarnings()">
+                                                <td><strong><t t-esc="w.name"/></strong></td>
+                                                <td><t t-esc="w.type"/></td>
+                                                <td>-<t t-esc="w.deduction"/> pts</td>
+                                                <td><span class="badge badge-soft-rose p-2"><t t-esc="w.status"/></span></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                                <div t-else="" class="text-center text-success py-4">
+                                    <i class="fa fa-check-circle fa-2x mb-2"/>
+                                    <div>Zero active disciplinary records. Perfect conduct!</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 5: Career Path (Roadmap) -->
+                        <div class="dash-panel my-4" t-if="state.data.career_path">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="panel-title mb-0"><i class="fa fa-compass text-primary me-2"/> Career Path Roadmap &amp; Role Fit</div>
+                                <span class="badge badge-soft-emerald p-2 fs-6">Target: <t t-esc="state.data.career_path.target_role"/></span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-around py-3 bg-light rounded-4">
+                                <div class="text-center">
+                                    <h2 class="fw-bold text-primary mb-0"><t t-esc="state.data.career_path.match_pct"/>%</h2>
+                                    <small class="text-muted fw-bold">Role Match Probability</small>
+                                </div>
+                                <div class="d-flex gap-4" t-if="state.data.career_path.steps and state.data.career_path.steps.length">
+                                    <t t-foreach="state.data.career_path.steps" t-as="st" t-key="st_index">
+                                        <div class="text-center">
+                                            <div class="btn btn-primary rounded-circle mb-2" style="width: 38px; height: 38px; line-height: 24px;"><t t-esc="st_index + 1"/></div>
+                                            <div class="small fw-bold text-dark"><t t-esc="st"/></div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 6: Attendance Calendar (Isolated strictly to My Portal) -->
+                        <t t-call="smart_employee_performance_management.AttendanceSystemSnippet"/>
+
+                        <!-- Leave Application & Quotas System -->
+                        <div class="dash-panel my-4">
+                            <div class="panel-title"><i class="fa fa-calendar-minus-o text-primary me-2"/> Leave Management &amp; Yearly Quotas</div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-3">
+                                    <div class="p-3 bg-light rounded-4 border text-center">
+                                        <span class="text-muted small fw-bold">Casual Leave (12 Days)</span>
+                                        <h3 class="fw-bold text-primary mb-0"><t t-esc="state.data.leave_balances.casual.available"/> / 12</h3>
+                                        <small class="text-muted">Days Available</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="p-3 bg-light rounded-4 border text-center">
+                                        <span class="text-muted small fw-bold">Sick Leave (14 Days)</span>
+                                        <h3 class="fw-bold text-danger mb-0"><t t-esc="state.data.leave_balances.sick.available"/> / 14</h3>
+                                        <small class="text-muted">Days Available</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="p-3 bg-light rounded-4 border text-center">
+                                        <span class="text-muted small fw-bold">Yearly Leave (10 Days)</span>
+                                        <h3 class="fw-bold text-success mb-0"><t t-esc="state.data.leave_balances.yearly.available"/> / 10</h3>
+                                        <small class="text-muted">Days Available</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="p-3 bg-light rounded-4 border text-center">
+                                        <span class="text-muted small fw-bold">Leave Without Pay (170 Days)</span>
+                                        <h3 class="fw-bold text-secondary mb-0"><t t-esc="state.data.leave_balances.unpaid.available"/> / 170</h3>
+                                        <small class="text-muted">Days Available</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row g-4">
+                                <div class="col-md-5">
+                                    <div class="p-3 bg-light rounded-4 border">
+                                        <h6 class="fw-bold mb-3"><i class="fa fa-paper-plane text-primary me-2"/>Apply for New Leave</h6>
+                                        <div class="mb-2">
+                                            <label class="form-label small text-muted">Category</label>
+                                            <select class="form-select form-select-sm rounded-3" t-model="state.leaveApplyForm.leave_type">
+                                                <option value="casual">Casual Leave (12 Days Max)</option>
+                                                <option value="sick">Sick Leave (14 Days Max)</option>
+                                                <option value="yearly">Yearly Leave (10 Days Max)</option>
+                                                <option value="unpaid">Leave Without Pay (170 Days Max)</option>
+                                            </select>
+                                        </div>
+                                        <div class="row g-2 mb-2">
+                                            <div class="col-6">
+                                                <label class="form-label small text-muted">From</label>
+                                                <input type="date" class="form-control form-control-sm rounded-3" t-model="state.leaveApplyForm.date_from"/>
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label small text-muted">To</label>
+                                                <input type="date" class="form-control form-control-sm rounded-3" t-model="state.leaveApplyForm.date_to"/>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label small text-muted">Reason</label>
+                                            <textarea class="form-control form-control-sm rounded-3" rows="2" placeholder="State purpose..." t-model="state.leaveApplyForm.reason"></textarea>
+                                        </div>
+                                        <button class="btn btn-primary btn-sm w-100 rounded-3 py-2 fw-bold" t-on-click="submitLeaveApplication">
+                                            Submit Leave Application
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-7">
+                                    <h6 class="fw-bold mb-2"><i class="fa fa-history text-secondary me-2"/>My Leave History</h6>
+                                    <table class="dash-table">
+                                        <thead><tr><th>Ref</th><th>Type</th><th>Duration</th><th>Days</th><th>Status</th></tr></thead>
+                                        <tbody>
+                                            <t t-if="state.data.my_leaves and state.data.my_leaves.length">
+                                                <t t-foreach="state.data.my_leaves" t-as="ml" t-key="ml.id">
+                                                    <tr>
+                                                        <td><strong><t t-esc="ml.reference"/></strong></td>
+                                                        <td><t t-esc="ml.leave_type"/></td>
+                                                        <td class="small"><t t-esc="ml.date_from"/> to <t t-esc="ml.date_to"/></td>
+                                                        <td><t t-esc="ml.days"/> d</td>
+                                                        <td>
+                                                            <span t-attf-class="badge #{ml.status === 'Approved' ? 'badge-soft-emerald' : (ml.status === 'Rejected' ? 'badge-soft-rose' : 'badge-soft-amber')} p-2">
+                                                                <t t-esc="ml.status"/>
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <t t-if="state.data.pending_leave_approvals and state.data.pending_leave_approvals.length">
+                                <div class="border-top pt-3 mt-4">
+                                    <h6 class="fw-bold text-success mb-2">
+                                        <i class="fa fa-gavel text-success me-2"/>Subordinate Leaves Awaiting Your Approval (<t t-esc="state.activeRole.toUpperCase()"/> Tier)
+                                    </h6>
+                                    <table class="dash-table">
+                                        <thead><tr><th>Applicant</th><th>Role Tier</th><th>Type</th><th>Dates</th><th>Action</th></tr></thead>
+                                        <tbody>
+                                            <t t-foreach="state.data.pending_leave_approvals" t-as="pla" t-key="pla.id">
+                                                <tr>
+                                                    <td><strong><t t-esc="pla.employee_name"/></strong></td>
+                                                    <td><span class="badge bg-light text-dark border"><t t-esc="pla.role"/></span></td>
+                                                    <td><t t-esc="pla.type"/></td>
+                                                    <td><t t-esc="pla.date_from"/> to <t t-esc="pla.date_to"/> (<t t-esc="pla.days"/> d)</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-success rounded-pill px-3 me-1" t-on-click="() => this.handleLeaveDecision(pla.id, 'approve')">Approve</button>
+                                                        <button class="btn btn-sm btn-danger rounded-pill px-3" t-on-click="() => this.handleLeaveDecision(pla.id, 'reject')">Reject</button>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+
+                    <!-- 6. AI ANALYTICS DASHBOARD -->
+                    <div t-if="state.activeTab === 'ai_analytics'" class="dash-view-content">
+                        <div class="kpi-cards-grid">
+                            <div class="kpi-metric-card card-purple"><div class="card-label">Promotion Probability</div><div class="card-number text-purple"><t t-esc="state.data.ai_kpis.promo_probability"/>%</div><div class="card-hint text-primary">Predictive Index</div></div>
+                            <div class="kpi-metric-card card-rose"><div class="card-label">Flight Risk Count</div><div class="card-number text-danger"><t t-esc="state.data.ai_kpis.flight_risk_count"/></div><div class="card-hint text-danger">Watchlist Flagged</div></div>
+                            <div class="kpi-metric-card card-amber"><div class="card-label">Burnout Probability</div><div class="card-number text-amber"><t t-esc="state.data.ai_kpis.burnout_risk_score"/>%</div><div class="card-hint text-warning">Workload Optimal</div></div>
+                            <div class="kpi-metric-card card-emerald"><div class="card-label">AI Model Confidence</div><div class="card-number text-emerald"><t t-esc="state.data.ai_kpis.ai_confidence"/>%</div><div class="card-hint text-success">LLM Validation</div></div>
+                        </div>
+
+                        <div class="dash-grid-2 mt-4">
+                            <div class="dash-panel">
+                                <div class="panel-title"><i class="fa fa-user-secret text-danger me-2"/> Employee Attrition &amp; Flight Matrix</div>
+                                <table class="dash-table" t-if="state.data.heatmap and state.data.heatmap.length">
+                                    <thead><tr><th>Target Role</th><th>Engagement</th><th>Burnout Risk</th><th>AI Outlook</th></tr></thead>
+                                    <tbody>
+                                        <t t-foreach="state.data.heatmap" t-as="hm" t-key="hm_index">
+                                            <tr>
+                                                <td><strong><t t-esc="hm.role"/></strong></td>
+                                                <td><t t-esc="hm.engagement"/> / 10</td>
+                                                <td><span class="badge badge-soft-amber p-2"><t t-esc="hm.burnout"/></span></td>
+                                                <td><strong t-attf-style="color: #{hm.color};"><t t-esc="hm.prediction"/></strong></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="dash-panel">
+                                <div class="panel-title"><i class="fa fa-lightbulb-o text-warning me-2"/> AI Strategic Recommendations</div>
+                                <t t-if="state.data.recommendations and state.data.recommendations.length">
+                                    <t t-foreach="state.data.recommendations" t-as="rc" t-key="rc_index">
+                                        <div class="p-3 mb-2 rounded bg-light border-start border-4 border-indigo">
+                                            <i class="fa fa-chevron-right text-indigo me-2"/><t t-esc="rc"/>
+                                        </div>
+                                    </t>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 7. REPORTS & 9-BOX TALENT GRID -->
+                    <div t-if="state.activeTab === 'reports'" class="dash-view-content">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="fw-bold mb-0 text-dark">KPI Performance &amp; Promotion Audit Trail</h4>
+                            <div class="btn-group">
+                                <button class="btn btn-success btn-sm me-2 shadow-sm" t-on-click="downloadXLSX"><i class="fa fa-file-excel-o me-1"/> Download XLSX</button>
+                                <button class="btn btn-primary btn-sm shadow-sm" t-on-click="downloadCSV"><i class="fa fa-file-text-o me-1"/> Export CSV</button>
+                            </div>
+                        </div>
+
+                        <div class="dash-panel mb-4">
+                            <div class="panel-title"><i class="fa fa-th-large text-primary me-2"/> 9-Box Talent Grid (Performance vs Potential Matrix)</div>
+                            <div class="dash-grid-3" t-if="state.data.nine_box and state.data.nine_box.length">
+                                <t t-foreach="state.data.nine_box" t-as="box" t-key="box_index">
+                                    <div class="p-3 rounded border text-center shadow-sm" t-attf-style="background: #{box.color}15; border-color: #{box.color} !important;">
+                                        <div class="h3 fw-bold mb-1" t-attf-style="color: #{box.color};"><t t-esc="box.count"/></div>
+                                        <div class="small fw-bold text-dark"><t t-esc="box.cell"/></div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+
+                        <div class="dash-panel">
+                            <table class="dash-table" t-if="state.data.reports_data and state.data.reports_data.length">
+                                <thead>
+                                    <tr><th>Employee</th><th>Department</th><th>Date</th><th>Task (30%)</th><th>Attendance (20%)</th><th>Training (20%)</th><th>Final KPI</th><th>Status</th></tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.data.reports_data" t-as="r" t-key="r_index">
+                                        <tr style="cursor: pointer;" t-on-click="() => this.openRecord('employee.kpi', r.id)">
+                                            <td><strong><t t-esc="r.employee"/></strong></td>
+                                            <td><t t-esc="r.dept"/></td>
+                                            <td><t t-esc="r.date"/></td>
+                                            <td><t t-esc="r.task"/>%</td>
+                                            <td><t t-esc="r.attendance"/>%</td>
+                                            <td><t t-esc="r.training"/>%</td>
+                                            <td><span class="badge badge-soft-indigo p-2"><t t-esc="r.kpi"/> pts</span></td>
+                                            <td><span class="badge badge-soft-emerald p-2"><t t-esc="r.state"/></span></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+
+                <AiChatWidget/>
+            </t>
+        </div>
+    </t>
+    <t t-name="smart_employee_performance_management.AttendanceSystemSnippet">
+        <div class="attendance-system-row mt-4" t-if="state.data.attendance_widget">
+            <div class="punch-live-card">
+                <div class="punch-nav-pill">
+                    <span class="pill-active">Attendance</span>
+                    <span class="pill-inactive" t-on-click="() => this.openModelList('employee.attendance.log', [], 'Recent Check-ins')">Recent Check-ins</span>
+                </div>
+
+                <div class="clock-display"><t t-esc="state.currentTimeStr"/></div>
+                <div class="date-display"><t t-esc="state.data.attendance_widget.today_date_str"/></div>
+
+                <div class="timer-gauge-wrap">
+                    <svg width="150" height="150" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="42" stroke="#e2e8f0" stroke-width="8" fill="transparent"/>
+                        <circle cx="50" cy="50" r="42" stroke="#10b981" stroke-width="8" fill="transparent"
+                                stroke-dasharray="264" stroke-dashoffset="120" stroke-linecap="round"/>
+                    </svg>
+                    <div class="gauge-center-text">
+                        <small class="text-uppercase text-muted fw-bold">Today's Hours</small>
+                        <h3 class="mb-0 fw-bold text-dark"><t t-esc="state.data.attendance_widget.hours_display"/></h3>
+                    </div>
+                </div>
+
+                <div class="punch-stats-lines">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span><i class="fa fa-circle text-success me-2" style="font-size: 0.6rem;"/>Punch In</span>
+                        <strong><t t-esc="state.data.attendance_widget.check_in_time"/></strong>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span><i class="fa fa-circle text-warning me-2" style="font-size: 0.6rem;"/>Punch Out</span>
+                        <span class="text-muted fst-italic"><t t-esc="state.data.attendance_widget.check_out_time"/></span>
+                    </div>
+                </div>
+
+                <div class="text-center mb-1 text-muted small text-uppercase fw-bold">Current Status</div>
+                <div class="text-center mb-2 fw-bold text-primary"><t t-esc="state.data.attendance_widget.current_status"/></div>
+                <button t-attf-class="btn #{state.data.attendance_widget.button_class || (state.data.attendance_widget.is_checked_in ? 'btn-danger' : 'btn-success')} w-100 py-2 fw-bold text-uppercase shadow-sm" t-on-click="togglePunch">
+                    <t t-esc="state.data.attendance_widget.button_label || (state.data.attendance_widget.is_checked_in ? 'PUNCH OUT' : 'PUNCH IN')"/>
+                </button>
+            </div>
+
+            <div class="attendance-calendar-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h4 class="fw-bold mb-0 text-dark">Attendance Overview</h4>
+                        <small class="text-danger fw-bold" t-if="state.data.attendance_widget.salary_deductions_days">
+                            <i class="fa fa-warning me-1"/> 4 Lates = 1 Day Salary Deduction (<t t-esc="state.data.attendance_widget.salary_deductions_days"/> Day(s) Deducted)
+                        </small>
+                    </div>
+                    <div class="d-flex align-items-center gap-1">
+                        <button class="btn btn-light btn-sm border" t-on-click="prevMonth"><i class="fa fa-chevron-left"/></button>
+                        <span class="px-2 py-1 bg-light border rounded fw-bold small"><t t-esc="state.data.attendance_widget.month_name"/></span>
+                        <span class="px-2 py-1 bg-light border rounded fw-bold small"><t t-esc="state.data.attendance_widget.year"/></span>
+                        <button class="btn btn-light btn-sm border" t-on-click="nextMonth"><i class="fa fa-chevron-right"/></button>
+                    </div>
+                </div>
+
+                <div class="calendar-summary-bar mb-3" t-if="state.data.attendance_widget.summary">
+                    <div class="sum-item"><i class="fa fa-circle text-dark me-1"/> <strong><t t-esc="state.data.attendance_widget.summary.payable_days"/></strong> <span>Payable Days</span></div>
+                    <div class="sum-item"><i class="fa fa-circle text-success me-1"/> <strong><t t-esc="state.data.attendance_widget.summary.present"/></strong> <span>Present</span></div>
+                    <div class="sum-item"><i class="fa fa-circle text-warning me-1"/> <strong><t t-esc="state.data.attendance_widget.summary.late"/></strong> <span>Late</span></div>
+                    <div class="sum-item"><i class="fa fa-circle text-primary me-1"/> <strong><t t-esc="state.data.attendance_widget.summary.movement"/></strong> <span>Movement</span></div>
+                    <div class="sum-item"><i class="fa fa-circle text-purple me-1"/> <strong><t t-esc="state.data.attendance_widget.summary.leave"/></strong> <span>Leave</span></div>
+                    <div class="sum-item"><i class="fa fa-circle text-danger me-1"/> <strong><t t-esc="state.data.attendance_widget.summary.absent"/></strong> <span>Absent</span></div>
+                </div>
+
+                <div class="calendar-month-table">
+                    <div class="day-header">SUN</div><div class="day-header">MON</div><div class="day-header">TUE</div>
+                    <div class="day-header">WED</div><div class="day-header">THU</div><div class="day-header">FRI</div><div class="day-header">SAT</div>
+
+                    <t t-if="state.data.attendance_widget.calendar_days and state.data.attendance_widget.calendar_days.length">
+                        <t t-foreach="state.data.attendance_widget.calendar_days" t-as="c" t-key="c.day ? ('day_' + c.day) : ('empty_' + c_index)">
+                            <div t-attf-class="day-cell has-tooltip #{c.is_today ? 'day-today' : ''} #{c.status === 'weekend' ? 'day-weekend' : ''}">
+                                <div class="cell-num"><t t-esc="c.day"/></div>
+                                <t t-if="c.status === 'present'">
+                                    <span class="cal-badge bg-soft-green">Present</span>
+                                </t>
+                                <t t-elif="c.status === 'late'">
+                                    <span class="cal-badge bg-soft-amber">Late</span>
+                                </t>
+                                <t t-elif="c.status === 'weekend'">
+                                    <span class="cal-badge bg-soft-grey">Weekend</span>
+                                </t>
+                                <t t-elif="c.status === 'leave'">
+                                    <span class="cal-badge bg-soft-purple">Leave</span>
+                                </t>
+                                <t t-elif="c.status === 'absent'">
+                                    <span class="cal-badge bg-soft-rose">Absent</span>
+                                </t>
+
+                                <div class="calendar-hover-tooltip" t-if="c.day and c.status != 'weekend' and c.status != 'future'">
+                                    <div class="fw-bold text-dark mb-1"><t t-esc="c.status_label"/> (Day <t t-esc="c.day"/>)</div>
+                                    <div class="text-muted small"><strong>In:</strong> <t t-esc="c.check_in || '--:--'"/></div>
+                                    <div class="text-muted small"><strong>Out:</strong> <t t-esc="c.check_out || '--:--'"/></div>
+                                    <div class="text-danger small fw-bold" t-if="c.late_mins">Late: <t t-esc="c.late_mins"/> min</div>
+                                </div>
+                            </div>
+                        </t>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+
+
+</templates>

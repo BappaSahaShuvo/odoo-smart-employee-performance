@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_employee_form_inherit_sp" model="ir.ui.view">
+        <field name="name">hr.employee.form.sp</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Performance &amp; Promotions">
+                    <group>
+                        <group string="Current Scores">
+                            <field name="kpi_score"/>
+                            <field name="kpi_attendance_score"/>
+                            <field name="kpi_training_score"/>
+                            <field name="service_duration_months"/>
+                        </group>
+                        <group string="Promotion &amp; Risk Readiness">
+                            <field name="active_warning_count"/>
+                            <field name="has_policy_violation"/>
+                            <field name="mandatory_training_completed"/>
+                            <field name="promotion_probability"/>
+                            <field name="attrition_risk_score"/>
+                        </group>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+</odoo>

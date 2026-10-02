@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="seq_warning_code" model="ir.sequence">
+        <field name="name">Disciplinary Warning Sequence</field>
+        <field name="code">warning.record</field>
+        <field name="prefix">WARN/%(year)s/</field>
+        <field name="padding">4</field>
+    </record>
+
+    <record id="seq_promotion_code" model="ir.sequence">
+        <field name="name">Promotion Request Sequence</field>
+        <field name="code">promotion.request</field>
+        <field name="prefix">PROM/%(year)s/</field>
+        <field name="padding">4</field>
+    </record>
+</odoo>

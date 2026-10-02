@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_employee_goal_tree" model="ir.ui.view">
+        <field name="name">employee.goal.list</field>
+        <field name="model">employee.goal</field>
+        <field name="arch" type="xml">
+            <list string="Goals">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="weightage"/>
+                <field name="due_date"/>
+                <field name="progress" widget="progressbar"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_employee_goal_form" model="ir.ui.view">
+        <field name="name">employee.goal.form</field>
+        <field name="model">employee.goal</field>
+        <field name="arch" type="xml">
+            <form string="Goal Dossier">
+                <header>
+                    <button name="action_submit" string="Submit" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_tl_approve" string="TL Approve" type="object" class="btn-success" invisible="state != 'submitted'"/>
+                    <button name="action_manager_approve" string="Manager Approve" type="object" class="btn-success" invisible="state != 'leader_approved'"/>
+                    <button name="action_complete" string="Mark Complete" type="object" class="btn-info" invisible="state != 'manager_approved'"/>
+                    <button name="action_reject" string="Reject" type="object" class="btn-danger" invisible="state not in ('submitted', 'leader_approved')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,leader_approved,manager_approved,completed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="employee_id"/>
+                            <field name="department_id"/>
+                        </group>
+                        <group>
+                            <field name="weightage"/>
+                            <field name="due_date"/>
+                            <field name="progress"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Approval Notes">
+                            <field name="comments"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

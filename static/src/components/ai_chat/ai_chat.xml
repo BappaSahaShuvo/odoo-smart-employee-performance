@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="smart_employee_performance_management.AiChatWidget">
+        <div style="position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;">
+            <button class="btn btn-primary rounded-circle shadow-lg"
+                    style="width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;"
+                    t-on-click="toggleChat">
+                <i class="fa fa-comments" style="font-size: 1.5rem;"/>
+            </button>
+            <t t-if="state.isOpen">
+                <div style="position: absolute; bottom: 65px; right: 0; width: 350px; height: 440px; background: #1e293b; border: 1px solid #334155; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                    <div style="background: #4f46e5; padding: 0.75rem 1rem; color: #ffffff; font-weight: 600; display: flex; justify-content: space-between; align-items: center;">
+                        <span>AI Performance Assistant</span>
+                        <i class="fa fa-times" style="cursor: pointer;" t-on-click="toggleChat"/>
+                    </div>
+                    <div style="flex: 1; padding: 0.75rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem;">
+                        <t t-foreach="state.messages" t-as="m" t-key="m_index">
+                            <div t-attf-style="text-align: #{m.role === 'user' ? 'right' : 'left'};">
+                                <span t-attf-style="display: inline-block; padding: 0.4rem 0.8rem; border-radius: 8px; max-width: 85%; font-size: 0.85rem; background: #{m.role === 'user' ? '#6366f1' : '#334155'}; color: #ffffff; text-align: left;">
+                                    <t t-esc="m.text"/>
+                                </span>
+                            </div>
+                        </t>
+                        <t t-if="state.isLoading">
+                            <div style="text-align: left;">
+                                <span style="display: inline-block; padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.85rem; background: #334155; color: #94a3b8;">
+                                    <i class="fa fa-circle-o-notch fa-spin"/> Analyzing...
+                                </span>
+                            </div>
+                        </t>
+                    </div>
+                    <div style="padding: 0.5rem; background: #0f172a; display: flex; gap: 0.5rem; border-top: 1px solid #334155;">
+                        <input type="text"
+                               class="form-control form-control-sm"
+                               placeholder="Ask about goals, KPIs..."
+                               style="background: #1e293b; color: #ffffff; border: 1px solid #475569;"
+                               t-model="state.inputMessage"
+                               t-on-keydown="(ev) => ev.key === 'Enter' and this.sendMessage()"/>
+                        <button class="btn btn-sm btn-primary" t-on-click="sendMessage">
+                            <i class="fa fa-paper-plane"/>
+                        </button>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

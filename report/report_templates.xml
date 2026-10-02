@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_kpi_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="page" style="font-family: sans-serif; padding: 2rem;">
+                    <h2 style="color: #4f46e5;">KPI Evaluation Dossier</h2>
+                    <hr/>
+                    <table style="width: 100%; margin-top: 1rem;">
+                        <tr><td><strong>Employee:</strong></td><td><span t-field="o.employee_id.name"/></td></tr>
+                        <tr><td><strong>Department:</strong></td><td><span t-field="o.department_id.name"/></td></tr>
+                        <tr><td><strong>Date:</strong></td><td><span t-field="o.date"/></td></tr>
+                        <tr><td><strong>Final KPI Score:</strong></td><td><span t-field="o.kpi_score"/> / 100</td></tr>
+                        <tr><td><strong>Warning Deduction:</strong></td><td>-<span t-field="o.warning_deduction"/></td></tr>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_warning_record_tree" model="ir.ui.view">
+        <field name="name">warning.record.list</field>
+        <field name="model">warning.record</field>
+        <field name="arch" type="xml">
+            <list string="Disciplinary Warnings">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="warning_type"/>
+                <field name="deduction_amount"/>
+                <field name="blocks_promotion"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+</odoo>

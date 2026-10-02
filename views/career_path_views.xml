@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_career_path_tree" model="ir.ui.view">
+        <field name="name">career.path.list</field>
+        <field name="model">career.path</field>
+        <field name="arch" type="xml">
+            <list string="Career Paths">
+                <field name="name"/>
+                <field name="current_job_id"/>
+                <field name="target_job_id"/>
+                <field name="required_kpi_score"/>
+            </list>
+        </field>
+    </record>
+</odoo>

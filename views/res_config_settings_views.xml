@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_smart_perf" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.perf</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Smart Performance" string="Smart Performance &amp; AI" name="smart_employee_performance_management">
+                    <block title="AI Engine Settings" id="smart_performance_ai_settings">
+                        <setting string="Enable AI Insights" help="Enable autonomous decision-support AI features">
+                            <field name="ai_enabled"/>
+                        </setting>
+                        <setting string="AI Provider" help="Choose between OpenAI or Local LLM (Ollama/vLLM)">
+                            <field name="ai_provider"/>
+                        </setting>
+                        <setting string="API Key" invisible="ai_provider != 'openai'">
+                            <field name="ai_api_key" password="True"/>
+                        </setting>
+                        <setting string="API Endpoint">
+                            <field name="ai_endpoint"/>
+                        </setting>
+                        <setting string="Model Name">
+                            <field name="ai_model"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

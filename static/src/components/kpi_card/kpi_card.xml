@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="smart_employee_performance_management.KpiCard">
+        <div class="kpi-card">
+            <div class="kpi-title"><t t-esc="props.title"/></div>
+            <div class="kpi-val"><t t-esc="props.value"/></div>
+        </div>
+    </t>
+</templates>

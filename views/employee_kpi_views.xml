@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_employee_kpi_tree" model="ir.ui.view">
+        <field name="name">employee.kpi.list</field>
+        <field name="model">employee.kpi</field>
+        <field name="arch" type="xml">
+            <list string="Monthly KPIs">
+                <field name="employee_id"/>
+                <field name="date"/>
+                <field name="kpi_category"/>
+                <field name="warning_deduction"/>
+                <field name="kpi_score" widget="badge"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_employee_kpi_form" model="ir.ui.view">
+        <field name="name">employee.kpi.form</field>
+        <field name="model">employee.kpi</field>
+        <field name="arch" type="xml">
+            <form string="KPI Evaluation">
+                <header>
+                    <button name="action_confirm" string="Confirm" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve" type="object" class="btn-success" invisible="state != 'confirmed'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,approved"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="General Info">
+                            <field name="employee_id"/>
+                            <field name="date"/>
+                            <field name="kpi_category"/>
+                        </group>
+                        <group string="Computed Outcomes">
+                            <field name="warning_deduction"/>
+                            <field name="kpi_score" style="font-size: 1.5rem; font-weight: bold; color: #4f46e5;"/>
+                        </group>
+                    </group>
+                    <group string="Mathematical Components (Weighted Formula)">
+                        <field name="task_completion"/>
+                        <field name="attendance_score"/>
+                        <field name="training_score"/>
+                        <field name="feedback_score"/>
+                        <field name="innovation_score"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

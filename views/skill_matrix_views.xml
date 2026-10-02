@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_skill_matrix_tree" model="ir.ui.view">
+        <field name="name">skill.matrix.list</field>
+        <field name="model">skill.matrix</field>
+        <field name="arch" type="xml">
+            <list string="Skill Matrix">
+                <field name="employee_id"/>
+                <field name="skill_category"/>
+                <field name="skill_name"/>
+                <field name="proficiency_level"/>
+                <field name="target_level"/>
+            </list>
+        </field>
+    </record>
+</odoo>

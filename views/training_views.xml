@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_training_course_tree" model="ir.ui.view">
+        <field name="name">training.course.list</field>
+        <field name="model">training.course</field>
+        <field name="arch" type="xml">
+            <list string="Training Courses">
+                <field name="name"/>
+                <field name="category"/>
+                <field name="duration_hours"/>
+                <field name="is_mandatory"/>
+            </list>
+        </field>
+    </record>
+</odoo>

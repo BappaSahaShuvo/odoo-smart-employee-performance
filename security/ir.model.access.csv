@@ -1,0 +1,15 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_emp_leave_all,employee.leave.all,model_employee_leave,,1,1,1,1
+access_hr_emp_perf_all,hr.employee.perf.all,hr.model_hr_employee,,1,1,1,1
+access_emp_goal_all,employee.goal.all,model_employee_goal,,1,1,1,1
+access_emp_kpi_all,employee.kpi.all,model_employee_kpi,,1,1,1,1
+access_perf_review_all,performance.review.all,model_performance_review,,1,1,1,1
+access_prom_req_all,promotion.request.all,model_promotion_request,,1,1,1,1
+access_prom_hist_all,promotion.history.all,model_promotion_history,,1,1,1,1
+access_warn_rec_all,warning.record.all,model_warning_record,,1,1,1,1
+access_rew_rec_all,reward.record.all,model_reward_record,,1,1,1,1
+access_train_crs_all,training.course.all,model_training_course,,1,1,1,1
+access_train_enr_all,training.enrollment.all,model_training_enrollment,,1,1,1,1
+access_skill_mat_all,skill.matrix.all,model_skill_matrix,,1,1,1,1
+access_career_path_all,career.path.all,model_career_path,,1,1,1,1
+access_emp_att_log_all,employee.attendance.log.all,model_employee_attendance_log,,1,1,1,1

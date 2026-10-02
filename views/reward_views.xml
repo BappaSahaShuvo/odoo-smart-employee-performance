@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_reward_record_tree" model="ir.ui.view">
+        <field name="name">reward.record.list</field>
+        <field name="model">reward.record</field>
+        <field name="arch" type="xml">
+            <list string="Rewards and Badges">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="reward_type"/>
+                <field name="points"/>
+                <field name="date"/>
+            </list>
+        </field>
+    </record>
+</odoo>

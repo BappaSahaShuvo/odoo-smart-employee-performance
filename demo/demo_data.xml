@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- 1. CEO User & Employee -->
+        <record id="user_perf_ceo" model="res.users">
+            <field name="name">Executive CEO</field>
+            <field name="login">ceo</field>
+            <field name="password">ceo</field>
+            <field name="email">ceo@company.internal</field>
+            <field name="groups_id" eval="[(6, 0, [ref('smart_employee_performance_management.group_performance_ceo')])]"/>
+        </record>
+        <record id="emp_perf_ceo" model="hr.employee">
+            <field name="name">Executive CEO</field>
+            <field name="user_id" ref="user_perf_ceo"/>
+            <field name="work_email">ceo@company.internal</field>
+            <field name="performance_role">ceo</field>
+            <field name="job_title">Chief Executive Officer</field>
+            <field name="shift_type">general</field>
+        </record>
+
+        <!-- 2. HR User & Employee -->
+        <record id="user_perf_hr" model="res.users">
+            <field name="name">Human Resources Lead</field>
+            <field name="login">hr</field>
+            <field name="password">hr</field>
+            <field name="email">hr@company.internal</field>
+            <field name="groups_id" eval="[(6, 0, [ref('smart_employee_performance_management.group_performance_hr')])]"/>
+        </record>
+        <record id="emp_perf_hr" model="hr.employee">
+            <field name="name">Human Resources Lead</field>
+            <field name="user_id" ref="user_perf_hr"/>
+            <field name="work_email">hr@company.internal</field>
+            <field name="performance_role">hr</field>
+            <field name="job_title">HR Director</field>
+            <field name="shift_type">morning</field>
+        </record>
+
+        <!-- 3. Manager User & Employee -->
+        <record id="user_perf_manager" model="res.users">
+            <field name="name">Department Operations Manager</field>
+            <field name="login">manager</field>
+            <field name="password">manager</field>
+            <field name="email">manager@company.internal</field>
+            <field name="groups_id" eval="[(6, 0, [ref('smart_employee_performance_management.group_performance_manager')])]"/>
+        </record>
+        <record id="emp_perf_manager" model="hr.employee">
+            <field name="name">Department Operations Manager</field>
+            <field name="user_id" ref="user_perf_manager"/>
+            <field name="work_email">manager@company.internal</field>
+            <field name="performance_role">manager</field>
+            <field name="job_title">Senior Project Manager</field>
+            <field name="shift_type">general</field>
+        </record>
+
+        <!-- 4. Team Leader User & Employee -->
+        <record id="user_perf_tl" model="res.users">
+            <field name="name">Agile Team Leader</field>
+            <field name="login">team_leader</field>
+            <field name="password">team_leader</field>
+            <field name="email">team_leader@company.internal</field>
+            <field name="groups_id" eval="[(6, 0, [ref('smart_employee_performance_management.group_performance_team_leader')])]"/>
+        </record>
+        <record id="emp_perf_tl" model="hr.employee">
+            <field name="name">Agile Team Leader</field>
+            <field name="user_id" ref="user_perf_tl"/>
+            <field name="work_email">team_leader@company.internal</field>
+            <field name="performance_role">team_leader</field>
+            <field name="job_title">Technical Team Lead</field>
+            <field name="shift_type">morning</field>
+        </record>
+    </data>
+</odoo>
