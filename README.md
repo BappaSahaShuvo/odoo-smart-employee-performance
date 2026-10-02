@@ -1,27 +1,97 @@
-# Smart Employee Performance & Promotion Management System (Odoo 19)
+# Smart Employee Performance & Promotion Management System
 
-## Overview
-Enterprise Human Resource Performance & Promotion Management custom module built for Odoo 19 and Python 3.12. Automates KPI scoring, goal tracking, promotion evaluations, disciplinary actions, skill matrix management, and AI career guidance.
+An enterprise-grade **Employee Performance, KPI, Promotion, Training, Goal, Attendance, and AI Management System** built as a custom module for **Odoo 19**.
 
-## Architecture
-- **Backend:** Python 3.12, Odoo 19 ORM, PostgreSQL
-- **Frontend:** Odoo OWL 2 Components, SCSS, QWeb
-- **Reporting:** QWeb PDF Engine, XLSX, CSV Export
-- **AI Integration:** OpenAI API and Local LLM (Ollama/vLLM) endpoint abstraction
+The system provides role-based HR dashboards, automated KPI calculations, employee goal tracking, promotion eligibility evaluation, disciplinary warning management, training management, career paths, skill matrices, rewards, performance reviews, AI-powered performance analysis, and PDF/XLSX/CSV reporting.
 
-## Key Workflows
-1. **Goal Lifecycle:** Draft -> Submitted -> TL Approved -> Manager Approved -> Active -> Completed.
-2. **KPI Engine:** $0.30(TC) + 0.20(A) + 0.20(T) + 0.15(F) + 0.15(I) - \text{Deductions}$.
-3. **Promotion Policy:** Minimum 6 months service, Attendance $\ge 80\%$, Active Warnings $< 3$, Mandatory Training Completed, and KPI Score $\ge 75$.
+---
 
-## Local AI with Ollama (WSL Ubuntu)
-1. Install Ollama inside the same WSL Ubuntu environment where Odoo runs.
-2. Start Ollama and download a model such as `llama3.2`.
-3. In Odoo Settings -> Smart Performance & AI, select `Local LLM (Ollama / vLLM)`, enable AI, set endpoint to `http://127.0.0.1:11434/api/chat`, and model to the installed model name.
-4. The dashboard chat sends the user's prompt to `/smart_performance/ai_chat` and uses the live employee record as context.
+## 📌 Project Overview
 
-## Report export
-The Reports tab now provides working authenticated HTTP endpoints:
-- `/smart_performance/export_kpi_xlsx`
-- `/smart_performance/export_kpi_csv`
-The buttons pass the active employee ID when available and download the live KPI records.
+The **Smart Employee Performance & Promotion Management System** is designed to centralize employee performance management inside Odoo.
+
+Instead of managing employee performance through spreadsheets and disconnected HR processes, this module provides an integrated workflow covering:
+
+- Employee performance tracking
+- KPI calculation
+- Goal management
+- Attendance monitoring
+- Leave management
+- Performance reviews
+- Promotion requests
+- Promotion history
+- Training courses and enrollment
+- Skill matrix management
+- Career path management
+- Employee rewards
+- Disciplinary warnings
+- Role-based dashboards
+- AI-powered performance analysis
+- HR analytics
+- PDF/XLSX/CSV reports
+
+The system uses Odoo's ORM, PostgreSQL, OWL, QWeb, scheduled actions, security groups, record rules, and external/local AI integrations.
+
+---
+
+# 🚀 Main Features
+
+## 1. Employee Performance Management
+
+The module extends the standard Odoo Employee functionality with performance-related information.
+
+Performance information can include:
+
+- Overall KPI score
+- Attendance score
+- Performance status
+- Employee role
+- Department
+- Reporting hierarchy
+- Service duration
+- Active warnings
+- Goals
+- Training
+- Promotion status
+- Career development information
+
+---
+
+# 📊 2. KPI Management
+
+The system provides a dedicated KPI management engine for measuring employee performance.
+
+KPI-related functionality includes:
+
+- KPI score calculation
+- Attendance score
+- Task completion
+- Training performance
+- Feedback
+- Initiative
+- Disciplinary deductions
+- Overall performance score
+- Employee KPI history
+- Department KPI analysis
+
+The dashboard can dynamically calculate company and employee performance metrics from live Odoo records.
+
+### KPI Concept
+
+The project uses weighted performance components together with applicable deductions.
+
+Example conceptual model:
+
+```text
+Overall KPI
+     │
+     ├── Task Completion
+     ├── Attendance
+     ├── Training
+     ├── Feedback
+     ├── Initiative
+     │
+     └── Disciplinary Deductions
+              │
+              ▼
+        Final KPI Score
